@@ -1,14 +1,15 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy_serializer import serializerMixin 
-from app import bcrypt
+from sqlalchemy_serializer import SerializerMixin 
+from .app import bcrypt
 from sqlalchemy.orm import validates
 from sqlalchemy import MetaData
 metadata = MetaData ()
+from . import db
 
 db = SQLAlchemy(metadata=metadata)
 
 
-class Admin(db.Model,serializerMixin):
+class Admin(db.Model,SerializerMixin):
     __tablename__ = 'admins'
     serialize_rules = ('-password_hash',)
 
@@ -33,7 +34,7 @@ class Admin(db.Model,serializerMixin):
         return f"<Admin {self.password_hash}>"
 
 
-class User(db.Model,serializerMixin):
+class User(db.Model,SerializerMixin):
     __tablename__ = 'users'
     serialize_rules = ('-password_hash',)
 

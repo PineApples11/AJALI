@@ -7,10 +7,11 @@ from flask_jwt_extended import (
     get_jwt,
     verify_jwt_in_request
 )
-from models import db, User, Admin, IncidentReport, Media, TokenBlocklist
+from .models import db, User, Admin, IncidentReport, Media, TokenBlocklist
 from datetime import datetime
 import json
 from functools import wraps
+from app import db
 
 api = Blueprint('api', __name__)
 
