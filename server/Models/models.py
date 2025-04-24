@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sql_serializer import serializerMixin # type: ignore
+from sqlalchemy_serializer import serializerMixin 
 from app import bcrypt
 from sqlalchemy.orm import validates
 from sqlalchemy import MetaData
@@ -10,7 +10,7 @@ db = SQLAlchemy(metadata=metadata)
 
 class Admin(db.Model,serializerMixin):
     __tablename__ = 'admins'
-    serializer_rules = ('-password_hash',)
+    serialize_rules = ('-password_hash',)
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), nullable=False)
@@ -35,7 +35,7 @@ class Admin(db.Model,serializerMixin):
 
 class User(db.Model,serializerMixin):
     __tablename__ = 'users'
-    serializer_rules = ('-password_hash',)
+    serialize_rules = ('-password_hash',)
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), nullable=False)
