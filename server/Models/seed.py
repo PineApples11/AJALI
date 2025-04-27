@@ -17,7 +17,24 @@ with app.app_context():
   Media.query.delete()
   IncidentReport.query.delete()
   User.query.delete()
+  # Admin.query.delete()
+
   # cleans the db if existing data iko
+
+  print("Seeding admins...")
+  admins = []
+
+  for _ in range(5):
+      admin = Admin(
+          username=fake.user_name(),
+          email=fake.email(),
+      )
+
+      admin.set_password("password")
+      admins.append(admin)
+      db.session.add(admin)
+
+  db.session.commit()
 
   print("Seeding users...")
   users = []
