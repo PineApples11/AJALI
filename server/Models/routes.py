@@ -114,13 +114,19 @@ def get_incidents():
 def create_incident():
     data = request.get_json()
     current_user = get_jwt_identity()
+    latitude = data.get('latitude')
+    longitude = data.get('longitude')
+    
+    if not latitude or not longitude:
+        return jsonify({"message": "Latitude and Longitude are required!"}),400
+
     incident = IncidentReport(
         title=data['title'],
         description=data['description'],
         type=data['type'],
         status='draft',
-        longitude=data['longitude'],
-        latitude=data['latitude'],
+        longitude=data,
+        latitude=data,
         user_id=current_user["id"]
     )
     db.session.add(incident)
