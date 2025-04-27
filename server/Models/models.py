@@ -4,6 +4,8 @@ from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
 from sqlalchemy import MetaData
 from Models.extensions import db, bcrypt
+from flask_jwt_extended import create_access_token
+from datetime import timedelta
 import enum
 
 metadata = MetaData ()
@@ -24,7 +26,7 @@ class Admin(db.Model,SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), nullable=False)
-    email = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120), nullable=False,unique=True)
     password_hash = db.Column(db.String(128), nullable=False)
    
     @validates('email')
@@ -49,7 +51,7 @@ class User(db.Model,SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), nullable=False)
-    email = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120), nullable=False,unique=True)
     password_hash = db.Column(db.String(128), nullable=False)
     phone_number = db.Column(db.String(50), nullable=False)
 
@@ -69,6 +71,11 @@ class User(db.Model,SerializerMixin):
 
     def __repr__(self):
         return f"<User {self.username}>"
+    
+    # creating a method to generate a JWT token for a user.
+
+    def create_jwt(self):
+        return create_access_token(identity=self.id,fresh=True,expires_delta=timedelta(hours=1))
 
 class IncidentReport(db.Model):
     __tablename__ = 'incident_reports'
@@ -100,7 +107,7 @@ class Media(db.Model):
     video_url = db.Column(db.String(256))
     incident_reports_id = db.Column(db.Integer, db.ForeignKey('incident_reports.id'), nullable=False)
 
-
+# this tracks JWT tokens that have been invalidated
 class TokenBlocklist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     jti = db.Column(db.String(36), nullable=False, index=True)
