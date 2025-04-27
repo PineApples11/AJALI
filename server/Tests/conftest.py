@@ -1,13 +1,14 @@
 import pytest
-from app import create_app
+from flask import Flask
+from Models.app import create_app
 from Models.extensions import db as _db
-from sqlalchemy import text
 
-TEST_DATABASE_URI = "postgresql://your_user:your_password@localhost/your_test_database"
+TEST_DATABASE_URI = "postgresql://pineapples:postgres@localhost/test_ajali"
 
 @pytest.fixture(scope="session")
 def app():
-    app = create_app('testing')
+    """Create the app with the 'testing' configuration"""
+    app = create_app('testing')  # Use your create_app function for testing config
     app.config.update({
         "TESTING": True,
         "SQLALCHEMY_DATABASE_URI": TEST_DATABASE_URI,
@@ -15,32 +16,30 @@ def app():
     })
 
     with app.app_context():
-        _db.create_all()
+        _db.create_all()  # Create all tables in the test database
         yield app
-        _db.session.close()
-        # Drop all tables after tests to keep it clean
-        _db.drop_all()
+        _db.session.remove()  # Clean up after tests
+        _db.drop_all()  # Drop all tables after tests
 
 @pytest.fixture(scope="function", autouse=True)
-def session(db):
-    """Rolls back after each test for clean isolation."""
+def session(app, db):
+    """ Rolls back after each test to ensure clean test isolation. """
     connection = db.engine.connect()
     transaction = connection.begin()
     options = dict(bind=connection, binds={})
-    sess = db.create_scoped_session(options=options)
+    
+    # Using db.session to manage the session in each test
+    yield db.session
 
-    db.session = sess
-
-    yield sess
-
-    transaction.rollback()
-    connection.close()
-    sess.remove()
+    transaction.rollback()  # Rollback to isolate tests
+    connection.close()  # Close the connection after the test
 
 @pytest.fixture
 def client(app):
+    """Provide a test client"""
     return app.test_client()
 
 @pytest.fixture
 def db(app):
+    """Return the database object for tests"""
     return _db
