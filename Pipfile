@@ -16,6 +16,7 @@ flask-jwt-extended = "*"
 flask-bcrypt = "*"
 psycopg2-binary = "*"
 faker = "*"
+flask-mail = "*"
 
 [dev-packages]
 
