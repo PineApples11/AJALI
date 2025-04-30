@@ -1,10 +1,18 @@
 from flask import Flask
 from Models.extensions import db, bcrypt, jwt, migrate, cors
 from Models.routes import api
+from .config import DevelopmentConfig, TestingConfig, ProductionConfig
 import os
 
-def create_app():
+def create_app(config_name='development'):
     app = Flask(__name__)
+    # app.config.from_object(config[config_name])
+    if config_name == 'testing':
+        app.config.from_object(TestingConfig)
+    elif config_name == 'production':
+        app.config.from_object(ProductionConfig)
+    else:
+        app.config.from_object(DevelopmentConfig) 
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://ajali_user:aJali!@localhost/ajali_db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
