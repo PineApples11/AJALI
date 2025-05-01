@@ -1,8 +1,8 @@
-"""Initial migration
+"""Initial migration.
 
-Revision ID: 38fceae6fd83
+Revision ID: 597dbb6d31c3
 Revises: 
-Create Date: 2025-04-26 20:26:33.358427
+Create Date: 2025-04-30 14:43:58.555722
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '38fceae6fd83'
+revision = '597dbb6d31c3'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -23,7 +23,8 @@ def upgrade():
     sa.Column('username', sa.String(length=128), nullable=False),
     sa.Column('email', sa.String(length=120), nullable=False),
     sa.Column('password_hash', sa.String(length=128), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email')
     )
     op.create_table('token_blocklist',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -39,8 +40,9 @@ def upgrade():
     sa.Column('username', sa.String(length=128), nullable=False),
     sa.Column('email', sa.String(length=120), nullable=False),
     sa.Column('password_hash', sa.String(length=128), nullable=False),
-    sa.Column('phone_number', sa.String(length=20), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.Column('phone_number', sa.String(length=50), nullable=False),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email')
     )
     op.create_table('incident_reports',
     sa.Column('id', sa.Integer(), nullable=False),
