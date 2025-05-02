@@ -1,3 +1,5 @@
+
+from Models.extensions import db,jwt
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import (
@@ -7,10 +9,13 @@ from flask_jwt_extended import (
     get_jwt,
     verify_jwt_in_request
 )
-from models import db, User, Admin, IncidentReport, Media, TokenBlocklist
+from Models.models import User, Admin, IncidentReport, Media, TokenBlocklist
 from datetime import datetime
 import json
 from functools import wraps
+
+
+
 
 api = Blueprint('api', __name__)
 
@@ -50,7 +55,7 @@ def signup():
     if User.query.filter_by(email=email).first():
         return jsonify({"error": "User already exists"}), 409
 
-    hashed_pw = generate_password_hash(password)
+    hashed_pw = bcrypt.generate_password_hash(password).decode('utf-8')
     new_user = User(username=username, email=email, password_hash=hashed_pw, phone_number=phone_number)
 
     db.session.add(new_user)
@@ -84,7 +89,7 @@ def logout():
 
 
 # --- INCIDENT ROUTES ---
-@api.route('/incident_reports', methods=['GET'])
+@api.route('/incidents', methods=['GET'])
 @jwt_required()
 @user_required
 def get_incidents():
@@ -102,19 +107,25 @@ def get_incidents():
     } for r in reports]), 200
 
 
-@api.route('/incident_reports', methods=['POST'])
+@api.route('/incidents', methods=['POST'])
 @jwt_required()
 @user_required
 def create_incident():
     data = request.get_json()
     current_user = get_jwt_identity()
+    latitude = data.get('latitude')
+    longitude = data.get('longitude')
+    
+    if not latitude or not longitude:
+        return jsonify({"message": "Latitude and Longitude are required!"}),400
+
     incident = IncidentReport(
         title=data['title'],
         description=data['description'],
         type=data['type'],
         status='draft',
-        longitude=data['longitude'],
-        latitude=data['latitude'],
+        longitude=data,
+        latitude=data,
         user_id=current_user["id"]
     )
     db.session.add(incident)
@@ -122,7 +133,7 @@ def create_incident():
     return jsonify({"message": "Incident created", "id": incident.id}), 201
 
 
-@api.route('/incident_reports/<int:id>', methods=['GET'])
+@api.route('/incidents/<int:id>', methods=['GET'])
 @jwt_required()
 @user_required
 def get_single_incident(id):
@@ -140,7 +151,7 @@ def get_single_incident(id):
     }), 200
 
 
-@api.route('/incident_reports/<int:id>', methods=['PATCH'])
+@api.route('/incidents/<int:id>', methods=['PATCH'])
 @jwt_required()
 @user_required
 def update_incident(id):
@@ -153,7 +164,7 @@ def update_incident(id):
     return jsonify({"message": f"Incident {id} updated"}), 200
 
 
-@api.route('/incident_reports/<int:id>', methods=['DELETE'])
+@api.route('/incidents/<int:id>', methods=['DELETE'])
 @jwt_required()
 @user_required
 def delete_incident(id):
@@ -164,7 +175,7 @@ def delete_incident(id):
 
 
 # --- MEDIA ROUTES ---
-@api.route('/incident_reports/<int:id>/media', methods=['POST'])
+@api.route('/incidents/<int:id>/media', methods=['POST'])
 @jwt_required()
 @user_required
 def upload_media(id):
@@ -188,7 +199,7 @@ def upload_media(id):
     return jsonify({"message": "Media uploaded successfully"}), 201
 
 
-@api.route('/incident_reports/<int:id>/media', methods=['GET'])
+@api.route('/incidents/<int:id>/media', methods=['GET'])
 @jwt_required()
 @user_required
 def get_media(id):
