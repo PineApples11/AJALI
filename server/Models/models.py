@@ -3,6 +3,7 @@ from sqlalchemy_serializer import serializerMixin
 from app import bcrypt
 from sqlalchemy.orm import validates
 from sqlalchemy import MetaData
+
 metadata = MetaData ()
 
 db = SQLAlchemy(metadata=metadata)
@@ -10,6 +11,7 @@ db = SQLAlchemy(metadata=metadata)
 
 class Admin(db.Model,serializerMixin):
     __tablename__ = 'admins'
+
     serialize_rules = ('-password_hash',)
 
     id = db.Column(db.Integer, primary_key=True)
@@ -35,6 +37,7 @@ class Admin(db.Model,serializerMixin):
 
 class User(db.Model,serializerMixin):
     __tablename__ = 'users'
+
     serialize_rules = ('-password_hash',)
 
     id = db.Column(db.Integer, primary_key=True)
@@ -84,8 +87,8 @@ class IncidentReport(db.Model):
 class Media(db.Model):
     __tablename__ = 'media'
     id = db.Column(db.Integer, primary_key=True)
-    image_url = db.Column(db.String(256)) 
-    Video_url = db.Column(db.String(256)) 
+    #image_url = db.Column(  #db.Text  (avoids truncated data)
+    #video_url = db.Column(db.String(256))  #db.Text  (avoids truncated data) , (lowercase video_url)
     incident_reports_id = db.Column(db.Integer, db.ForeignKey('incident_reports.id'), nullable=False)
 
 

@@ -35,7 +35,6 @@ admin_required = role_required("admin")
 def index():
     return jsonify({"message": "Welcome to the AJALI API"}), 200
 
-
 # --- AUTH ROUTES ---
 @api.route('/signup', methods=['POST'])
 def signup():
