@@ -1,0 +1,31 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main  # You can change this to any branch you want to track
+  pull_request:
+    branches:
+      - main  # Automatically run tests when a PR is made against the main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'  # You can change this to any version you're using
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Assumes you have a requirements.txt file with your dependencies
+
+      - name: Run tests
+        run: |
+          pytest --maxfail=1 --disable-warnings -q  # Run your tests here
