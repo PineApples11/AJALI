@@ -2,9 +2,14 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import Homepage from './pages/Homepage';
 import AdminDashboard from './pages/AdminDashboard';
+<<<<<<< HEAD
 import IncidentForm from './components/IncidentForm';
 import MediaUpload from './components/MediaUpload';
 import ProtectedRoute from './components/ProtectedRoute';
+=======
+import ProtectedRoute from './components/ProtectedRoute';
+
+>>>>>>> development
 function App() {
   return (
     <Router>
@@ -19,6 +24,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+<<<<<<< HEAD
         <Route 
           path="/report-incident" 
           element={
@@ -35,8 +41,15 @@ function App() {
             </ProtectedRoute>
           } 
         />
+=======
+>>>>>>> development
       </Routes>
     </Router>
   );
 }
+<<<<<<< HEAD
 export default App;
+=======
+
+export default App;
+>>>>>>> development

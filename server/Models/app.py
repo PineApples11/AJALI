@@ -15,7 +15,7 @@ def create_app(config_name='development'):
     else:
         app.config.from_object(DevelopmentConfig) 
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://ajali_user:aJali!@localhost/ajali_db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://ajali_user:aJali!@db:5432/ajali_db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'fallback-secret')
 
