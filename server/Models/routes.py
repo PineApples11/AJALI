@@ -1,5 +1,5 @@
 
-from Models.extensions import db,jwt
+from Models.extensions import db,jwt, bcrypt
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import (
@@ -52,6 +52,9 @@ def signup():
     password = data.get('password')
     phone_number = data.get('phone_number')
 
+    if not all([username, email, password, phone_number]):
+        return jsonify({"error": "Missing required fields: username, email, password, phone_number"}), 400
+    
     if User.query.filter_by(email=email).first():
         return jsonify({"error": "User already exists"}), 409
 
@@ -124,8 +127,8 @@ def create_incident():
         description=data['description'],
         type=data['type'],
         status='draft',
-        longitude=data,
-        latitude=data,
+        longitude=longitude,
+        latitude=latitude,
         user_id=current_user["id"]
     )
     db.session.add(incident)
@@ -216,14 +219,22 @@ def get_media(id):
 @jwt_required()
 @admin_required
 def update_status(id):
-    data = request.get_json()
+    data = request.get_json() or {}
     new_status = data.get('status')
+    if not new_status:
+        return jsonify({"error": "Missing new status"}), 400
+
+    valid_statuses = ['draft', 'pending', 'in-progress', 'resolved']
+    if new_status not in valid_statuses:
+        return jsonify({"error": f"Invalid status. Valid statuses are: {', '.join(valid_statuses)}"}), 400
+
     incident = IncidentReport.query.get_or_404(id)
     current_admin = get_jwt_identity()
     incident.status = new_status
     incident.last_updated_by_admin_id = current_admin["id"]
     db.session.commit()
     return jsonify({"message": f"Status for incident {id} updated to {new_status}"}), 200
+
 
 
 # --- ADMIN AUTH ROUTES ---
@@ -237,6 +248,9 @@ def admin_signup():
     email = data.get('email')
     password = data.get('password')
 
+    if not all([username, email, password]):
+        return jsonify({"error": "Missing required fields: username, email, password"}), 400
+    
     if Admin.query.filter_by(email=email).first():
         return jsonify({"error": "Admin already exists"}), 409
 
