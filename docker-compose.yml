@@ -1,0 +1,42 @@
+# docker-compose.yml
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    volumes:
+      - ./server:/app
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=Models/app.py
+      - FLASK_RUN_HOST=0.0.0.0
+      - FLASK_ENV=development
+      - SQLALCHEMY_DATABASE_URI=postgresql://ajali_user:aJali!@db:5432/ajali_db
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./ajali-frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./ajali-frontend:/app
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: ajali_user
+      POSTGRES_PASSWORD: aJali!
+      POSTGRES_DB: ajali_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

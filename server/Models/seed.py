@@ -20,7 +20,7 @@ with app.app_context():
   # Admin.query.delete()
 
   # cleans the db if existing data iko
-
+ 
   print("Seeding admins...")
   admins = []
 
